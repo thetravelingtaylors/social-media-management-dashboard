@@ -961,29 +961,61 @@
   .ttt-header{
     border: 2.5px solid #2a1d28;
     background: #ffffff;
-    padding: 44px 52px;
+    padding: 0;
     position: relative;
     box-shadow: 8px 8px 0 #2a1d28;
     margin-bottom: 36px;
     overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    align-items: stretch;
+    min-height: 460px;
   }
-  .ttt-header::before{
+  .ttt-header-text{
+    padding: 44px 52px;
+    position: relative;
+    z-index: 1;
+    align-self: center;
+  }
+  .ttt-header-image{
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffd25f 0%, #f4a8c1 100%);
+    border-left: 1.5px solid #2a1d28;
+  }
+  .ttt-header-image img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+  @media (max-width: 900px){
+    .ttt-header{ grid-template-columns: 1fr; min-height: auto; }
+    .ttt-header-image{ border-left: none; border-top: 1.5px solid #2a1d28; height: 240px; }
+    .ttt-header-text{ padding: 32px 28px; }
+  }
+  .ttt-header-text::before{
     content:'';
     position: absolute;
-    top: -140px; right: -140px;
-    width: 360px; height: 360px;
+    top: -120px; left: -120px;
+    width: 280px; height: 280px;
     background: radial-gradient(circle, #ffd25f 0%, #ffe89a 50%, transparent 70%);
     border-radius: 50%;
-    opacity: 0.65;
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: -1;
   }
-  .ttt-header::after{
+  .ttt-header-text::after{
     content:'';
     position: absolute;
-    bottom: -100px; left: -100px;
-    width: 260px; height: 260px;
+    bottom: -80px; right: -40px;
+    width: 200px; height: 200px;
     background: radial-gradient(circle, #f4a8c1 0%, transparent 70%);
     border-radius: 50%;
-    opacity: 0.5;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: -1;
   }
   .ttt-h1{
     font-family: 'Fraunces', serif;
@@ -1144,27 +1176,58 @@
   .ajt-header{
     border: 2px solid #1a1a1a;
     background: #ffffff;
-    padding: 56px 60px;
+    padding: 0;
     position: relative;
     box-shadow: 10px 10px 0 #1a1a1a;
     margin-bottom: 40px;
     overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    align-items: stretch;
+    min-height: 480px;
   }
   .ajt-header::before{
     content:'';
     position: absolute;
-    top: 0; right: 0;
+    top: 0; left: 0;
     width: 4px; height: 100%;
     background: #e8682a;
+    z-index: 2;
   }
-  .ajt-header::after{
+  .ajt-header-text{
+    padding: 56px 60px;
+    position: relative;
+    z-index: 1;
+    align-self: center;
+  }
+  .ajt-header-text::after{
     content:'';
     position: absolute;
-    top: -120px; right: -120px;
-    width: 280px; height: 280px;
+    top: -120px; right: -50px;
+    width: 240px; height: 240px;
     background: radial-gradient(circle, rgba(232,104,42,0.18) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
+    z-index: -1;
+  }
+  .ajt-header-image{
+    position: relative;
+    overflow: hidden;
+    background: #1a1a1a;
+    border-left: 1.5px solid #1a1a1a;
+  }
+  .ajt-header-image img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+  @media (max-width: 900px){
+    .ajt-header{ grid-template-columns: 1fr; min-height: auto; }
+    .ajt-header-image{ border-left: none; border-top: 1.5px solid #1a1a1a; height: 320px; }
+    .ajt-header-image img{ object-position: center 30%; }
+    .ajt-header-text{ padding: 36px 32px; }
   }
   .ajt-header-eyebrow{
     font-family: 'DM Mono', monospace;
@@ -1385,25 +1448,59 @@
   .mrt-header{
     border: 2px solid #1a1a1a;
     background: #ffffff;
-    padding: 56px 60px;
+    padding: 0;
     position: relative;
     box-shadow: 10px 10px 0 #ec3b8a;
     margin-bottom: 40px;
     overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    align-items: stretch;
+    min-height: 480px;
   }
-  .mrt-header::before{
+  .mrt-header-text{
+    padding: 56px 60px;
+    position: relative;
+    z-index: 1;
+    align-self: center;
+  }
+  .mrt-header-text::before{
     content:'';
     position: absolute;
-    top: -100px; right: -100px;
-    width: 280px; height: 280px;
-    background: radial-gradient(circle, rgba(236,59,138,0.22) 0%, transparent 70%);
+    top: -100px; left: -80px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(236,59,138,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
   }
-  .mrt-header::after{
+  .mrt-header-text::after{
     content:'';
     position: absolute;
-    bottom: -80px; left: -80px;
-    width: 220px; height: 220px;
+    bottom: -80px; left: 30%;
+    width: 200px; height: 200px;
     background: radial-gradient(circle, rgba(255,200,220,0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .mrt-header-image{
+    position: relative;
+    overflow: hidden;
+    background: #fff5f8;
+    border-left: 1.5px solid #1a1a1a;
+  }
+  .mrt-header-image img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+  @media (max-width: 900px){
+    .mrt-header{ grid-template-columns: 1fr; min-height: auto; }
+    .mrt-header-image{ border-left: none; border-top: 1.5px solid #1a1a1a; height: 280px; }
+    .mrt-header-text{ padding: 36px 32px; }
   }
   .mrt-header-eyebrow{
     font-family: 'DM Mono', monospace;
@@ -1771,14 +1868,17 @@
   <div class="container">
 
     <div class="ttt-header">
-      <div style="position:relative; z-index:1;">
+      <div class="ttt-header-text">
         <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8a2a52; margin-bottom:14px; font-weight:500;">✈️ Brand Dashboard · Travel</div>
         <h1 class="ttt-h1">The Traveling<br><em>Taylors</em></h1>
-        <p style="font-family:'Fraunces',serif; font-style:italic; font-size:18px; color:#5a4452; margin-top:18px; max-width:580px; line-height:1.5;">A mother-daughter duo. 45+ countries. 5 of 7 continents. One field guide for managing every channel, schedule, and post.</p>
+        <p style="font-family:'Fraunces',serif; font-style:italic; font-size:18px; color:#5a4452; margin-top:18px; max-width:520px; line-height:1.5;">A mother-daughter duo. 45+ countries. 5 of 7 continents. One field guide for managing every channel, schedule, and post.</p>
         <a href="https://thetravelingtaylors.world" target="_blank" rel="noopener" style="margin-top:18px; display:inline-flex; align-items:center; gap:10px; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#2a1d28; text-decoration:none; padding:10px 16px; background:#fff5e6; border:1.5px solid #d44d83; transition:all 0.2s ease; font-weight:600;">🌐 thetravelingtaylors.world ↗</a>
         <div style="margin-top:24px; padding-top:20px; border-top:1px dashed rgba(42,29,40,0.18); font-family:'Fraunces',serif; font-size:14px; color:#5a4452; letter-spacing:0.04em;">
           <strong style="color:#d44d83; font-size:16px;">T</strong>raveling. <strong style="color:#d44d83; font-size:16px;">A</strong>dventurous. <strong style="color:#d44d83; font-size:16px;">Y</strong>oung. <strong style="color:#d44d83; font-size:16px;">L</strong>uxurious. <strong style="color:#d44d83; font-size:16px;">O</strong>dyssey. <strong style="color:#d44d83; font-size:16px;">R</strong>oaming.
         </div>
+      </div>
+      <div class="ttt-header-image">
+        <img src="https://thetravelingtaylors.world/wp-content/uploads/2025/02/The-Traveling-Taylors_Greece_Hero-Photo-edited-4.jpg" alt="The Traveling Taylors in Greece" loading="lazy" />
       </div>
     </div>
 
@@ -2096,12 +2196,17 @@
   <div class="container">
 
     <div class="ajt-header">
-      <div class="ajt-header-eyebrow">Personal Brand · Creative Entrepreneur</div>
-      <h1 class="ajt-h1">Ashleigh Jessica<br><em>Taylor</em></h1>
-      <p class="ajt-subtitle">Where business meets freedom, and creativity knows no borders.</p>
-      <a href="https://ashleighjessicataylor.com" target="_blank" rel="noopener" class="ajt-website">🌐 ashleighjessicataylor.com ↗</a>
-      <div class="ajt-divider"></div>
-      <div class="ajt-tagline"><span>Brand Builder</span> · <span>Entrepreneur</span> · <span>Global Explorer</span></div>
+      <div class="ajt-header-text">
+        <div class="ajt-header-eyebrow">Personal Brand · Creative Entrepreneur</div>
+        <h1 class="ajt-h1">Ashleigh Jessica<br><em>Taylor</em></h1>
+        <p class="ajt-subtitle">Where business meets freedom, and creativity knows no borders.</p>
+        <a href="https://ashleighjessicataylor.com" target="_blank" rel="noopener" class="ajt-website">🌐 ashleighjessicataylor.com ↗</a>
+        <div class="ajt-divider"></div>
+        <div class="ajt-tagline"><span>Brand Builder</span> · <span>Entrepreneur</span> · <span>Global Explorer</span></div>
+      </div>
+      <div class="ajt-header-image">
+        <img src="https://ashleighjessicataylor.com/wp-content/uploads/2025/04/Ashleigh-Jessica-Taylor-In-Tenerife-Spain-1-683x1024.png" alt="Ashleigh Jessica Taylor in Tenerife, Spain" loading="lazy" />
+      </div>
     </div>
 
     <div class="ajt-ventures">
@@ -2266,16 +2371,21 @@
   <div class="container">
 
     <div class="mrt-header">
-      <div class="mrt-header-eyebrow">✦ Personal Brand · Lifestyle &amp; Retirement</div>
-      <h1 class="mrt-h1">Marva Rudder<br><em>Taylor</em></h1>
-      <p class="mrt-subtitle">Life's too short for limits — exploring, thriving &amp; living fully at every age.</p>
-      <a href="https://marvaruddertaylor.com" target="_blank" rel="noopener" class="mrt-website">🌐 marvaruddertaylor.com ↗</a>
-      <div class="mrt-ornament">
-        <span class="line"></span>
-        <span class="star">✦</span>
-        <span class="text">Adventure · Growth · Joy</span>
-        <span class="star">✦</span>
-        <span class="line"></span>
+      <div class="mrt-header-text">
+        <div class="mrt-header-eyebrow">✦ Personal Brand · Lifestyle &amp; Retirement</div>
+        <h1 class="mrt-h1">Marva Rudder<br><em>Taylor</em></h1>
+        <p class="mrt-subtitle">Life's too short for limits — exploring, thriving &amp; living fully at every age.</p>
+        <a href="https://marvaruddertaylor.com" target="_blank" rel="noopener" class="mrt-website">🌐 marvaruddertaylor.com ↗</a>
+        <div class="mrt-ornament">
+          <span class="line"></span>
+          <span class="star">✦</span>
+          <span class="text">Adventure · Growth · Joy</span>
+          <span class="star">✦</span>
+          <span class="line"></span>
+        </div>
+      </div>
+      <div class="mrt-header-image">
+        <img src="https://marvaruddertaylor.com/wp-content/uploads/2025/05/Marva-Rudder-Taylor_Santorini-Greece-Picture_75pctsmaller-1024x681.png" alt="Marva Rudder Taylor in Santorini, Greece" loading="lazy" />
       </div>
     </div>
 
