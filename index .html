@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Traveling Taylors SMM · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400;1,9..144,600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     GLOBAL RESET & SHARED CHROME
+     ============================================ */
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html, body{
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.5s ease;
+  }
+
+  /* SVG defs hide */
+  .svg-defs{ position:absolute; width:0; height:0; }
+
+  /* ============================================
+     SHARED NAV BAR (always visible at top)
+     ============================================ */
+  .top-nav{
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1.5px solid rgba(0,0,0,0.1);
+    padding: 14px 36px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    transition: all 0.4s ease;
+  }
+  .top-nav.warm{
+    background: rgba(255,253,247,0.92);
+  }
+  .top-nav.editorial{
+    background: rgba(250,250,250,0.94);
+  }
+  .top-nav.rose{
+    background: rgba(255,245,248,0.94);
+  }
+
+  .nav-brand{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 16px;
+    color: #1a1a1a;
+    text-decoration: none;
+    margin-right: auto;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links{ display: flex; gap: 4px; flex-wrap: wrap; }
+  .nav-link{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border: 1.5px solid #1a1a1a;
+    color: #1a1a1a;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    font-weight: 500;
+  }
+
+  .nav-link:hover{
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .nav-link.active{
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+  .top-nav.editorial .nav-link.active{ background: #e8682a; border-color: #e8682a; }
+  .top-nav.rose .nav-link.active{ background: #ec3b8a; border-color: #ec3b8a; }
+  .top-nav.warm .nav-link.active{ background: #d44d83; border-color: #d44d83; }
+
+  /* ============================================
+     VIEW SWITCHING
+     ============================================ */
+  .view{ display: none; animation: fadeIn 0.5s ease; }
+  .view.active{ display: block; }
+  @keyframes fadeIn{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  body[data-view="home"]{ background: #ffffff; }
+  body[data-view="ttt"]{ background: #fffdf7; }
+  body[data-view="ajt"]{ background: #fafafa; }
+  body[data-view="mrt"]{ background: #fff5f8; }
+
+  /* ============================================
+     HOME VIEW
+     ============================================ */
+  .home-container{
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 36px 80px;
+  }
+
+  .home-hero{
+    text-align: center;
+    padding: 60px 24px 56px;
+    border: 2.5px solid #1a1a1a;
+    background: #ffffff;
+    box-shadow: 10px 10px 0 #1a1a1a;
+    margin-bottom: 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-hero::before{
+    content:'';
+    position: absolute;
+    top: -150px; left: -150px;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(255,210,95,0.55) 0%, transparent 70%);
+    opacity: 0.7;
+  }
+  .home-hero::after{
+    content:'';
+    position: absolute;
+    bottom: -120px; right: -120px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(236,59,138,0.35) 0%, transparent 70%);
+    opacity: 0.7;
+  }
+
+  .home-eyebrow{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8a2a52;
+    margin-bottom: 20px;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+
+  .home-title{
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(48px, 8vw, 92px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    color: #2a1d28;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .home-title em{
+    font-style: italic;
+    font-weight: 600;
+    color: #d44d83;
+  }
+
+  .home-subtitle{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: #5a4452;
+    max-width: 620px;
+    margin: 0 auto 32px;
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
+  }
+
+  .home-meta-row{
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #5a4452;
+    position: relative;
+    z-index: 1;
+    margin-top: 8px;
+  }
+  .home-meta-row span{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .home-meta-row .dot{
+    width: 5px; height: 5px;
+    background: #d44d83;
+    border-radius: 50%;
+  }
+
+  /* Brand cards on home */
+  .brand-grid-label{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8a2a52;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-weight: 600;
+  }
+  .brand-grid-label::before{ content:'✦'; color: #d44d83; font-size: 14px; }
+  .brand-grid-label::after{
+    content:'';
+    flex: 1;
+    height: 1px;
+    background: rgba(138,42,82,0.3);
+  }
+
+  .brand-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 56px;
+  }
+  @media (max-width: 980px){ .brand-grid{ grid-template-columns: 1fr; } }
+
+  .brand-card{
+    border: 2.5px solid #2a1d28;
+    padding: 36px 32px 32px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    min-height: 380px;
+    position: relative;
+    overflow: hidden;
+  }
+  .brand-card:hover{
+    transform: translate(-4px, -4px);
+    box-shadow: 8px 8px 0 #2a1d28;
+  }
+
+  /* TTT brand card */
+  .brand-card.ttt{
+    background: linear-gradient(160deg, #ffeec9 0%, #fcd5e1 100%);
+  }
+  .brand-card.ttt::before{
+    content:'';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, #ffd25f 0%, transparent 70%);
+    opacity: 0.6;
+  }
+
+  /* AJT brand card */
+  .brand-card.ajt{
+    background: #ffffff;
+    color: #1a1a1a;
+    border-color: #1a1a1a;
+  }
+  .brand-card.ajt::before{
+    content:'';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(232,104,42,0.25) 0%, transparent 70%);
+  }
+  .brand-card.ajt:hover{ box-shadow: 8px 8px 0 #e8682a; }
+  .brand-card.ajt .brand-card-name{ color: #1a1a1a; }
+  .brand-card.ajt .brand-card-tagline,
+  .brand-card.ajt .brand-card-desc{ color: #4a4a4a; }
+  .brand-card.ajt .brand-card-arrow{ color: #e8682a; }
+  .brand-card.ajt .brand-card-eyebrow{ color: #e8682a !important; }
+
+  /* MRT brand card */
+  .brand-card.mrt{
+    background: #ffffff;
+    color: #1a1a1a;
+    border-color: #1a1a1a;
+  }
+  .brand-card.mrt:hover{ box-shadow: 8px 8px 0 #ec3b8a; }
+  .brand-card.mrt::before{
+    content:'';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(236,59,138,0.28) 0%, transparent 70%);
+  }
+  .brand-card.mrt .brand-card-name{ color: #1a1a1a; font-family: 'Playfair Display', serif; }
+  .brand-card.mrt .brand-card-tagline,
+  .brand-card.mrt .brand-card-desc{ color: #4a4a4a; }
+  .brand-card.mrt .brand-card-arrow{ color: #ec3b8a; }
+
+  .brand-card-eyebrow{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8a2a52;
+    margin-bottom: 16px;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+  .brand-card.ajt .brand-card-eyebrow{ color: #e8682a; }
+  .brand-card.mrt .brand-card-eyebrow{ color: #ec3b8a; }
+
+  .brand-card-name{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 12px;
+    color: #2a1d28;
+    position: relative;
+    z-index: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-card-tagline{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #5a4452;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-card-stats{
+    display: flex;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding: 14px 0;
+    border-top: 1px dashed currentColor;
+    border-bottom: 1px dashed currentColor;
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
+  }
+  .brand-card-stat{
+    flex: 1;
+    text-align: center;
+  }
+  .brand-card-stat .n{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1;
+    color: #d44d83;
+  }
+  .brand-card.ajt .brand-card-stat .n{ color: #e8682a; }
+  .brand-card.mrt .brand-card-stat .n{ color: #ec3b8a; font-family: 'Playfair Display', serif; }
+  .brand-card-stat .l{
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    opacity: 0.75;
+  }
+
+  .brand-card-desc{
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #5a4452;
+    position: relative;
+    z-index: 1;
+    margin-bottom: auto;
+  }
+
+  .brand-card-cta{
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .brand-card-cta-text{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .brand-card-arrow{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 32px;
+    color: #d44d83;
+    transition: transform 0.3s ease;
+  }
+  .brand-card:hover .brand-card-arrow{ transform: translate(6px, -6px); }
+
+  /* Quick links section on home */
+  .home-quicklinks{
+    border: 2px dashed #1a1a1a;
+    background: #fffaf0;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+  }
+  .home-ql-title{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 16px;
+    color: #1a1a1a;
+  }
+  .home-ql-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .home-ql-btn{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    background: #ffffff;
+    border: 1.5px solid #1a1a1a;
+    color: #1a1a1a;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-weight: 500;
+  }
+  .home-ql-btn:hover{
+    background: #1a1a1a;
+    color: #ffffff;
+    transform: translate(-2px, -2px);
+    box-shadow: 3px 3px 0 #ec3b8a;
+  }
+
+  /* ============================================
+     SHARED LAYOUT (used inside each brand)
+     ============================================ */
+  .container{
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 36px 36px 80px;
+  }
+
+  /* tabs */
+  .tabs{
+    display: flex;
+    gap: 0;
+  }
+  .tab{
+    background: transparent;
+    border: 2.5px solid currentColor;
+    border-bottom: none;
+    padding: 16px 32px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: -2.5px;
+    margin-bottom: -2.5px;
+    font-weight: 500;
+  }
+  .tab .tab-num{ margin-right: 8px; font-weight: 600; }
+
+  /* panel */
+  .panel{
+    border: 2.5px solid currentColor;
+    border-top: none;
+    padding: 48px 52px;
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .panel.active{ display: block; }
+
+  .panel-intro{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    margin-bottom: 36px;
+    padding-bottom: 22px;
+    border-bottom: 1px dashed currentColor;
+    flex-wrap: wrap;
+  }
+  .panel-title{
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+  .panel-meta{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border: 1.5px solid currentColor;
+    font-weight: 500;
+  }
+
+  /* quick links bar inside panel */
+  .quick-links{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 36px;
+    padding: 22px 26px;
+    border: 2px dashed currentColor;
+    align-items: center;
+  }
+  .quick-links-label{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-right: 8px;
+    font-weight: 600;
+  }
+  .ql-btn{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border: 1.5px solid currentColor;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+
+  /* tasks */
+  .task-list{ display: grid; gap: 18px; }
+  .task-section-label{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 28px 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-weight: 600;
+  }
+  .task-section-label:first-child{ margin-top: 0; }
+  .task-section-label::before{ content: '✦'; font-size: 14px; }
+  .task-section-label::after{
+    content:'';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.25;
+  }
+
+  .task{
+    border: 1.5px solid currentColor;
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 76px 1fr auto;
+    gap: 26px;
+    align-items: start;
+    transition: all 0.25s ease;
+  }
+  .task-num{
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 52px;
+    line-height: 1;
+    font-style: italic;
+  }
+  .task-body h3{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 10px;
+    letter-spacing: -0.005em;
+  }
+  .task-body p{ font-size: 15px; line-height: 1.65; }
+  .task-body p + p{ margin-top: 8px; }
+  .task-body strong{ font-weight: 600; }
+  .task-body a{
+    text-decoration: none;
+    border-bottom: 1.5px dotted currentColor;
+    transition: all 0.15s ease;
+    font-weight: 500;
+  }
+
+  /* inline task action buttons */
+  .task-actions{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .task-action-btn{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border: 1.5px solid currentColor;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    background: transparent;
+  }
+  .task-action-btn .arr{ font-size: 12px; }
+
+  .tag-stack{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  .task-tag{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 11px;
+    border: 1.5px solid currentColor;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .cadence{
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .cadence::before{
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* social */
+  .social-section{ margin-bottom: 48px; }
+  .section-label{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-weight: 600;
+  }
+  .section-label::after{
+    content:'';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.25;
+  }
+
+  .social-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+  }
+  .social-card{
+    border: 2px solid currentColor;
+    padding: 28px 28px 26px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+    position: relative;
+    display: block;
+    overflow: hidden;
+    min-height: 170px;
+  }
+  .social-card .logo-wrap{
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    transition: all 0.25s ease;
+  }
+  .social-card .logo-wrap svg{ width: 32px; height: 32px; }
+  .social-card .platform{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1.1;
+  }
+  .social-card .handle{
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    word-break: break-all;
+    line-height: 1.5;
+    margin-top: 8px;
+    opacity: 0.75;
+  }
+  .social-card .arrow-go{
+    position: absolute;
+    bottom: 22px;
+    right: 24px;
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    transition: transform 0.25s ease;
+    font-weight: 600;
+  }
+  .social-card:hover{ transform: translate(-3px, -3px); }
+  .social-card:hover .arrow-go{ transform: translate(5px, -5px); }
+
+  /* idle card */
+  .idle-card{
+    margin-top: 40px;
+    border: 2.5px solid currentColor;
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 24px;
+    align-items: flex-start;
+    position: relative;
+  }
+  .idle-card .icon{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 50px;
+    line-height: 1;
+  }
+  .idle-card h4{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 21px;
+    margin-bottom: 10px;
+  }
+  .idle-list{
+    margin-top: 14px;
+    padding-left: 0;
+    list-style: none;
+  }
+  .idle-list li{
+    padding: 10px 0;
+    border-top: 1px dashed currentColor;
+    font-size: 14.5px;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  .idle-list li:last-child{ border-bottom: 1px dashed currentColor; }
+  .idle-list li .marker{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: inherit;
+    opacity: 0.7;
+  }
+  .idle-list li strong{ font-weight: 600; }
+
+  .cadence-legend{
+    margin-top: 32px;
+    padding: 20px 24px;
+    border: 1px solid currentColor;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+  .cadence-legend .legend-label{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-right: 6px;
+    font-weight: 600;
+  }
+  .cadence-legend .item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .quote-card{
+    margin-top: 40px;
+    padding: 36px 40px;
+    border: 2px dashed currentColor;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.45;
+    position: relative;
+  }
+  .quote-card::before, .quote-card::after{
+    content:'"';
+    font-family: 'Fraunces', serif;
+    font-size: 70px;
+    line-height: 1;
+    opacity: 0.3;
+    position: absolute;
+  }
+  .quote-card::before{ top: 8px; left: 18px; }
+  .quote-card::after{ bottom: -22px; right: 18px; }
+  .quote-card .attribution{
+    display: block;
+    margin-top: 14px;
+    font-size: 12px;
+    font-style: normal;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  footer{
+    margin-top: 48px;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  /* analytics embed */
+  .analytics-wrap{
+    position: relative;
+    border: 2px solid currentColor;
+    background: #ffffff;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .analytics-wrap::before{
+    content: '';
+    display: block;
+    padding-top: 75%; /* aspect ratio for 600x450 */
+  }
+  .analytics-wrap iframe{
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .analytics-meta{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    border: 1.5px dashed currentColor;
+    margin-bottom: 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .analytics-meta .live-dot{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+  .analytics-meta .live-dot::before{
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #d44d83;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%, 100%{ opacity: 1; transform: scale(1); }
+    50%{ opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .analytics-notes{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .analytics-note{
+    border: 1px solid currentColor;
+    padding: 20px 22px;
+    background: rgba(255,255,255,0.4);
+  }
+  .analytics-note h5{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .analytics-note p{
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+
+  /* ============================================
+     TTT BRAND THEME (Pink + Yellow)
+     ============================================ */
+  #view-ttt{ color: #2a1d28; }
+  #view-ttt::before{
+    content:'';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 10% 0%, rgba(255,210,95,0.4) 0%, transparent 40%),
+      radial-gradient(ellipse at 100% 25%, rgba(244,168,193,0.32) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 100%, rgba(255,232,154,0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  #view-ttt > .container{ position: relative; z-index: 2; }
+
+  .ttt-header{
+    border: 2.5px solid #2a1d28;
+    background: #ffffff;
+    padding: 44px 52px;
+    position: relative;
+    box-shadow: 8px 8px 0 #2a1d28;
+    margin-bottom: 36px;
+    overflow: hidden;
+  }
+  .ttt-header::before{
+    content:'';
+    position: absolute;
+    top: -140px; right: -140px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, #ffd25f 0%, #ffe89a 50%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0.65;
+  }
+  .ttt-header::after{
+    content:'';
+    position: absolute;
+    bottom: -100px; left: -100px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, #f4a8c1 0%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+  .ttt-h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(42px, 6.5vw, 72px);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    color: #2a1d28;
+    position: relative;
+    z-index: 1;
+  }
+  .ttt-h1 em{
+    font-style: italic;
+    font-weight: 600;
+    color: #d44d83;
+    background: linear-gradient(180deg, transparent 60%, #ffd25f 60%, #ffd25f 88%, transparent 88%);
+    padding: 0 6px;
+  }
+
+  .ttt-stats{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-bottom: 36px;
+    border: 2.5px solid #2a1d28;
+    background: #ffffff;
+    box-shadow: 8px 8px 0 #2a1d28;
+  }
+  .ttt-stats .stat{
+    padding: 24px 22px;
+    border-right: 1.5px solid #2a1d28;
+    text-align: center;
+  }
+  .ttt-stats .stat:last-child{ border-right: none; }
+  .ttt-stats .stat:nth-child(2){ background: #ffe89a; }
+  .ttt-stats .stat:nth-child(3){ background: #fcd5e1; }
+  .ttt-stats .num{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 38px;
+    color: #d44d83;
+    line-height: 1;
+  }
+  .ttt-stats .label{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #5a4452;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  #view-ttt .tabs{ border-bottom: 2.5px solid #2a1d28; }
+  #view-ttt .tab{ color: #5a4452; }
+  #view-ttt .tab:hover{ background: #ffe89a; color: #2a1d28; }
+  #view-ttt .tab.active{
+    background: #ffffff;
+    color: #d44d83;
+    border-bottom: 2.5px solid #ffffff;
+    z-index: 2;
+  }
+  #view-ttt .tab .tab-num{ color: #d44d83; }
+  #view-ttt .tab.active .tab-num{ color: #8a2a52; }
+
+  #view-ttt .panel{
+    background: #ffffff;
+    color: #2a1d28;
+    box-shadow: 8px 8px 0 #2a1d28;
+  }
+  #view-ttt .panel-title{ font-family: 'Fraunces', serif; }
+  #view-ttt .panel-title em{ color: #d44d83; font-style: italic; font-weight: 600; }
+  #view-ttt .panel-meta{ background: #ffd25f; color: #8a2a52; }
+
+  #view-ttt .quick-links{ background: #ffe89a; border-color: #8a2a52; }
+  #view-ttt .quick-links-label{ color: #8a2a52; }
+  #view-ttt .ql-btn{ background: #fff8ec; color: #2a1d28; }
+  #view-ttt .ql-btn:hover{ background: #d44d83; color: #fff8ec; transform: translate(-2px,-2px); box-shadow: 3px 3px 0 #2a1d28; }
+
+  #view-ttt .task{ background: rgba(255,255,255,0.65); }
+  #view-ttt .task:hover{ background: #ffeec9; transform: translate(-2px,-2px); box-shadow: 5px 5px 0 #f4a8c1; }
+  #view-ttt .task-num{ color: #d44d83; }
+  #view-ttt .task-body p{ color: #5a4452; }
+  #view-ttt .task-body a{ color: #d44d83; border-bottom-color: #d44d83; }
+  #view-ttt .task-body a:hover{ color: #8a2a52; background: #ffd25f; border-bottom-style: solid; }
+  #view-ttt .task-section-label{ color: #8a2a52; }
+  #view-ttt .task-section-label::before{ color: #d44d83; }
+  #view-ttt .task-action-btn{ background: #fff8ec; border-color: #d44d83; color: #8a2a52; }
+  #view-ttt .task-action-btn:hover{ background: #d44d83; color: #fff8ec; transform: translate(-2px,-2px); box-shadow: 3px 3px 0 #2a1d28; }
+
+  #view-ttt .task-tag{ color: #2a1d28; }
+  #view-ttt .task-tag.youtube{ background: #f4a8c1; color: #8a2a52; }
+  #view-ttt .task-tag.meta{ background: #ffd25f; }
+  #view-ttt .task-tag.editing{ background: #ffeec9; }
+  #view-ttt .task-tag.pinterest{ background: #fcd5e1; color: #c0392b; border-color: #c0392b; }
+  #view-ttt .task-tag.trending{ background: #ffe89a; color: #8a2a52; border-color: #8a2a52; }
+  #view-ttt .task-tag.goals{ background: #8a2a52; color: #fff8ec; border-color: #8a2a52; }
+
+  #view-ttt .cadence.weekly{ background: #8a2a52; color: #fff8ec; }
+  #view-ttt .cadence.weekly::before{ background: #ffd25f; }
+  #view-ttt .cadence.daily{ background: #d44d83; color: #fff8ec; }
+  #view-ttt .cadence.daily::before{ background: #ffd25f; }
+  #view-ttt .cadence.biweekly{ background: #2a1d28; color: #fff8ec; }
+  #view-ttt .cadence.biweekly::before{ background: #f4a8c1; }
+  #view-ttt .cadence.monthly{ background: #ffd25f; color: #8a2a52; border: 1.5px solid #8a2a52; padding: 3.5px 9px; }
+  #view-ttt .cadence.monthly::before{ background: #8a2a52; }
+  #view-ttt .cadence.ongoing{ background: #fff8ec; color: #8a2a52; border: 1.5px solid #8a2a52; padding: 3.5px 9px; }
+  #view-ttt .cadence.ongoing::before{ background: #8a2a52; }
+
+  #view-ttt .idle-card{
+    background: linear-gradient(135deg, #f4a8c1 0%, #ffe89a 100%);
+    border-color: #2a1d28;
+  }
+  #view-ttt .idle-card .icon{ color: #8a2a52; }
+  #view-ttt .idle-card h4{ color: #2a1d28; }
+  #view-ttt .idle-card p{ color: #2a1d28; }
+  #view-ttt .idle-list li{ border-color: rgba(42,29,40,0.25); }
+  #view-ttt .idle-card a{ color: #8a2a52; border-bottom-color: #8a2a52; font-weight: 600; }
+
+  #view-ttt .cadence-legend{ background: rgba(255,255,255,0.5); border-color: rgba(42,29,40,0.18); }
+  #view-ttt .section-label{ color: #8a2a52; }
+
+  #view-ttt .social-card{ border-color: #2a1d28; color: #2a1d28; }
+  #view-ttt .social-card .logo-wrap{ background: #fff8ec; border-color: #2a1d28; }
+  #view-ttt .social-card.youtube{ background: #fcd5e1; }
+  #view-ttt .social-card.youtube:hover{ background: #f4a8c1; box-shadow: 7px 7px 0 #d44d83; }
+  #view-ttt .social-card.instagram{ background: #ffe89a; }
+  #view-ttt .social-card.instagram:hover{ background: #ffd25f; box-shadow: 7px 7px 0 #d44d83; }
+  #view-ttt .social-card.facebook{ background: #ffeec9; }
+  #view-ttt .social-card.facebook:hover{ background: #fcd5e1; box-shadow: 7px 7px 0 #d44d83; }
+  #view-ttt .social-card.pinterest{ background: #fcd5e1; }
+  #view-ttt .social-card.pinterest:hover{ background: #f4a8c1; box-shadow: 7px 7px 0 #d44d83; }
+  #view-ttt .social-card.individual{ background: #fff8ec; }
+  #view-ttt .social-card.individual:hover{ background: #ffe89a; box-shadow: 7px 7px 0 #d44d83; }
+  #view-ttt .social-card .arrow-go{ color: #8a2a52; }
+
+  #view-ttt .quote-card{ background: rgba(255,255,255,0.5); border-color: #8a2a52; color: #2a1d28; }
+  #view-ttt .quote-card::before, #view-ttt .quote-card::after{ color: #d44d83; opacity: 0.4; }
+  #view-ttt .quote-card .attribution{ color: #d44d83; }
+
+  /* ============================================
+     AJT BRAND THEME (Bright White + Orange accent)
+     Brand colors: pulled from Ashleigh's orange dress photo
+     ============================================ */
+  #view-ajt{ color: #1a1a1a; font-family: 'Inter', sans-serif; }
+  #view-ajt::before{
+    content:'';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 80% 0%, rgba(232,104,42,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 0% 100%, rgba(232,104,42,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  #view-ajt > .container{ position: relative; z-index: 2; }
+
+  .ajt-header{
+    border: 2px solid #1a1a1a;
+    background: #ffffff;
+    padding: 56px 60px;
+    position: relative;
+    box-shadow: 10px 10px 0 #1a1a1a;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+  .ajt-header::before{
+    content:'';
+    position: absolute;
+    top: 0; right: 0;
+    width: 4px; height: 100%;
+    background: #e8682a;
+  }
+  .ajt-header::after{
+    content:'';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(232,104,42,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .ajt-header-eyebrow{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #e8682a;
+    margin-bottom: 18px;
+    font-weight: 600;
+    position: relative; z-index: 1;
+  }
+  .ajt-h1{
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: #1a1a1a;
+    margin-bottom: 18px;
+    position: relative; z-index: 1;
+  }
+  .ajt-h1 em{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: #e8682a;
+  }
+  .ajt-subtitle{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: #4a4a4a;
+    max-width: 580px;
+    line-height: 1.4;
+    position: relative; z-index: 1;
+  }
+  .ajt-website{
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    text-decoration: none;
+    padding: 10px 16px;
+    background: #fff7ef;
+    border: 1.5px solid #e8682a;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    position: relative; z-index: 1;
+  }
+  .ajt-website:hover{
+    background: #e8682a;
+    color: #ffffff;
+    transform: translate(-2px,-2px);
+    box-shadow: 3px 3px 0 #1a1a1a;
+  }
+  .ajt-divider{
+    margin: 28px 0 0;
+    height: 1px;
+    background: #1a1a1a;
+    width: 60px;
+    position: relative; z-index: 1;
+  }
+  .ajt-tagline{
+    margin-top: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    font-weight: 500;
+    position: relative; z-index: 1;
+  }
+  .ajt-tagline span{ color: #e8682a; font-weight: 600; }
+
+  .ajt-ventures{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-bottom: 36px;
+    border: 2px solid #1a1a1a;
+    background: #ffffff;
+    box-shadow: 8px 8px 0 #1a1a1a;
+  }
+  .ajt-ventures .v{
+    padding: 28px 24px;
+    border-right: 1.5px solid #1a1a1a;
+    text-align: center;
+  }
+  .ajt-ventures .v:last-child{ border-right: none; }
+  .ajt-ventures .v:nth-child(2){ background: #fff7ef; }
+  .ajt-ventures .v-num{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #e8682a;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .ajt-ventures .v-name{
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  .ajt-ventures .v-desc{
+    font-size: 12px;
+    color: #4a4a4a;
+    line-height: 1.5;
+  }
+  @media (max-width: 800px){
+    .ajt-ventures{ grid-template-columns: 1fr; }
+    .ajt-ventures .v{ border-right: none; border-bottom: 1.5px solid #1a1a1a; }
+    .ajt-ventures .v:last-child{ border-bottom: none; }
+  }
+
+  #view-ajt .tabs{ border-bottom: 2px solid #1a1a1a; }
+  #view-ajt .tab{ color: #4a4a4a; border-color: #1a1a1a; }
+  #view-ajt .tab:hover{ background: #fff7ef; color: #1a1a1a; }
+  #view-ajt .tab.active{
+    background: #ffffff;
+    color: #e8682a;
+    border-bottom: 2px solid #ffffff;
+    z-index: 2;
+  }
+  #view-ajt .tab .tab-num{ color: #e8682a; }
+
+  #view-ajt .panel{
+    background: #ffffff;
+    color: #1a1a1a;
+    box-shadow: 8px 8px 0 #1a1a1a;
+    border-color: #1a1a1a;
+  }
+  #view-ajt .panel-title{ font-family: 'Playfair Display', serif; font-style: italic; }
+  #view-ajt .panel-title em{ color: #e8682a; font-weight: 600; font-style: italic; }
+  #view-ajt .panel-meta{ background: #1a1a1a; color: #ffffff; border-color: #1a1a1a; }
+
+  #view-ajt .quick-links{ background: #fff7ef; border-color: #e8682a; }
+  #view-ajt .quick-links-label{ color: #e8682a; }
+  #view-ajt .ql-btn{ background: #ffffff; color: #1a1a1a; border-color: #1a1a1a; }
+  #view-ajt .ql-btn:hover{ background: #e8682a; color: #ffffff; border-color: #e8682a; transform: translate(-2px,-2px); box-shadow: 3px 3px 0 #1a1a1a; }
+
+  #view-ajt .task{ background: #fafafa; border-color: #1a1a1a; }
+  #view-ajt .task:hover{ background: #fff7ef; transform: translate(-2px,-2px); box-shadow: 5px 5px 0 #e8682a; }
+  #view-ajt .task-num{ color: #e8682a; font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; }
+  #view-ajt .task-body h3{ font-family: 'Playfair Display', serif; font-weight: 600; }
+  #view-ajt .task-body p{ color: #4a4a4a; }
+  #view-ajt .task-body a{ color: #e8682a; border-bottom-color: #e8682a; }
+  #view-ajt .task-body a:hover{ color: #1a1a1a; background: #fff7ef; border-bottom-style: solid; }
+  #view-ajt .task-section-label{ color: #e8682a; }
+  #view-ajt .task-section-label::before{ color: #e8682a; }
+  #view-ajt .task-action-btn{ background: #fff7ef; border-color: #e8682a; color: #1a1a1a; }
+  #view-ajt .task-action-btn:hover{ background: #e8682a; color: #ffffff; transform: translate(-2px,-2px); box-shadow: 3px 3px 0 #1a1a1a; }
+
+  #view-ajt .task-tag{ color: #1a1a1a; border-color: #1a1a1a; }
+  #view-ajt .task-tag.youtube{ background: #e8682a; color: #ffffff; border-color: #e8682a; }
+  #view-ajt .task-tag.blog{ background: #1a1a1a; color: #ffffff; border-color: #1a1a1a; }
+  #view-ajt .task-tag.community{ background: #fff7ef; }
+  #view-ajt .task-tag.goals{ background: #e8682a; color: #ffffff; border-color: #e8682a; }
+  #view-ajt .task-tag.podcast{ background: #1a1a1a; color: #ffffff; border-color: #1a1a1a; }
+  #view-ajt .task-tag.trending{ background: #fbb040; color: #1a1a1a; border-color: #1a1a1a; }
+
+  #view-ajt .cadence{ font-family: 'DM Mono', monospace; }
+  #view-ajt .cadence.weekly{ background: #1a1a1a; color: #ffffff; }
+  #view-ajt .cadence.weekly::before{ background: #e8682a; }
+  #view-ajt .cadence.daily{ background: #e8682a; color: #ffffff; }
+  #view-ajt .cadence.daily::before{ background: #ffffff; }
+  #view-ajt .cadence.biweekly{ background: #4a4a4a; color: #ffffff; }
+  #view-ajt .cadence.biweekly::before{ background: #e8682a; }
+  #view-ajt .cadence.monthly{ background: #fff7ef; color: #e8682a; border: 1.5px solid #e8682a; padding: 3.5px 9px; }
+  #view-ajt .cadence.monthly::before{ background: #e8682a; }
+  #view-ajt .cadence.ongoing{ background: #ffffff; color: #1a1a1a; border: 1.5px solid #1a1a1a; padding: 3.5px 9px; }
+  #view-ajt .cadence.ongoing::before{ background: #1a1a1a; }
+
+  #view-ajt .idle-card{ background: linear-gradient(135deg, #fff7ef 0%, #ffe5cf 100%); color: #1a1a1a; border-color: #1a1a1a; }
+  #view-ajt .idle-card .icon{ color: #e8682a; }
+  #view-ajt .idle-card h4{ color: #1a1a1a; font-family: 'Playfair Display', serif; }
+  #view-ajt .idle-card p{ color: #4a4a4a; }
+  #view-ajt .idle-list li{ border-color: rgba(26,26,26,0.2); color: #4a4a4a; }
+  #view-ajt .idle-list li .marker{ color: #e8682a; }
+  #view-ajt .idle-card a{ color: #e8682a; border-bottom-color: #e8682a; font-weight: 600; }
+
+  #view-ajt .cadence-legend{ background: #fafafa; border-color: rgba(26,26,26,0.18); }
+  #view-ajt .section-label{ color: #e8682a; }
+
+  #view-ajt .social-card{ background: #ffffff; border-color: #1a1a1a; color: #1a1a1a; }
+  #view-ajt .social-card .logo-wrap{ background: #fff7ef; border-color: #1a1a1a; }
+  #view-ajt .social-card .platform{ font-family: 'Playfair Display', serif; }
+  #view-ajt .social-card:hover{ background: #fff7ef; box-shadow: 7px 7px 0 #e8682a; }
+  #view-ajt .social-card .arrow-go{ color: #e8682a; }
+
+  #view-ajt .quote-card{ background: #fff7ef; color: #1a1a1a; border-color: #e8682a; font-family: 'Playfair Display', serif; }
+  #view-ajt .quote-card::before, #view-ajt .quote-card::after{ color: #e8682a; opacity: 0.5; }
+  #view-ajt .quote-card .attribution{ color: #e8682a; }
+
+  /* ============================================
+     MRT BRAND THEME (Bright White + Hot Pink + Rose Gold accents)
+     ============================================ */
+  #view-mrt{ color: #1a1a1a; font-family: 'Inter', sans-serif; }
+  #view-mrt::before{
+    content:'';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(236,59,138,0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at 100% 80%, rgba(236,59,138,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 0%, rgba(255,200,220,0.18) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  #view-mrt > .container{ position: relative; z-index: 2; }
+
+  .mrt-header{
+    border: 2px solid #1a1a1a;
+    background: #ffffff;
+    padding: 56px 60px;
+    position: relative;
+    box-shadow: 10px 10px 0 #ec3b8a;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+  .mrt-header::before{
+    content:'';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(236,59,138,0.22) 0%, transparent 70%);
+  }
+  .mrt-header::after{
+    content:'';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(255,200,220,0.4) 0%, transparent 70%);
+  }
+  .mrt-header-eyebrow{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #ec3b8a;
+    margin-bottom: 18px;
+    font-weight: 600;
+    position: relative; z-index: 1;
+  }
+  .mrt-h1{
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .mrt-h1 em{
+    font-style: italic;
+    font-weight: 500;
+    color: #ec3b8a;
+  }
+  .mrt-subtitle{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: #4a4a4a;
+    max-width: 600px;
+    line-height: 1.45;
+    position: relative; z-index: 1;
+  }
+  .mrt-website{
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    text-decoration: none;
+    padding: 10px 16px;
+    background: #fff5f8;
+    border: 1.5px solid #ec3b8a;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    position: relative; z-index: 1;
+  }
+  .mrt-website:hover{
+    background: #ec3b8a;
+    color: #ffffff;
+    transform: translate(-2px,-2px);
+    box-shadow: 3px 3px 0 #1a1a1a;
+  }
+  .mrt-ornament{
+    margin: 28px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative; z-index: 1;
+  }
+  .mrt-ornament .line{ flex: 0 0 60px; height: 1px; background: #ec3b8a; }
+  .mrt-ornament .star{ color: #ec3b8a; font-size: 20px; }
+  .mrt-ornament .text{
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    font-weight: 500;
+  }
+
+  .mrt-pillars{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-bottom: 36px;
+    border: 2px solid #1a1a1a;
+    background: #ffffff;
+    box-shadow: 6px 6px 0 #ec3b8a;
+  }
+  .mrt-pillars .p{
+    padding: 24px 20px;
+    border-right: 1.5px solid rgba(26,26,26,0.15);
+    text-align: center;
+  }
+  .mrt-pillars .p:last-child{ border-right: none; }
+  .mrt-pillars .p:nth-child(2){ background: #fff5f8; }
+  .mrt-pillars .p:nth-child(3){ background: #fff5f8; }
+  .mrt-pillars .num{
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 36px;
+    color: #ec3b8a;
+    line-height: 1;
+  }
+  .mrt-pillars .label{
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+  @media (max-width: 720px){ .mrt-pillars{ grid-template-columns: repeat(2, 1fr); } }
+
+  #view-mrt .tabs{ border-bottom: 2px solid #1a1a1a; }
+  #view-mrt .tab{ color: #4a4a4a; border-color: #1a1a1a; }
+  #view-mrt .tab:hover{ background: #fff5f8; color: #1a1a1a; }
+  #view-mrt .tab.active{
+    background: #ffffff;
+    color: #ec3b8a;
+    border-bottom: 2px solid #ffffff;
+    z-index: 2;
+  }
+  #view-mrt .tab .tab-num{ color: #ec3b8a; }
+
+  #view-mrt .panel{
+    background: #ffffff;
+    color: #1a1a1a;
+    box-shadow: 8px 8px 0 #ec3b8a;
+    border-color: #1a1a1a;
+  }
+  #view-mrt .panel-title{ font-family: 'Playfair Display', serif; }
+  #view-mrt .panel-title em{ color: #ec3b8a; font-weight: 500; font-style: italic; }
+  #view-mrt .panel-meta{ background: #ec3b8a; color: #ffffff; border-color: #ec3b8a; }
+
+  #view-mrt .quick-links{ background: #fff5f8; border-color: #ec3b8a; }
+  #view-mrt .quick-links-label{ color: #ec3b8a; }
+  #view-mrt .ql-btn{ background: #ffffff; color: #1a1a1a; border-color: #1a1a1a; }
+  #view-mrt .ql-btn:hover{ background: #ec3b8a; color: #ffffff; border-color: #ec3b8a; transform: translate(-2px,-2px); box-shadow: 3px 3px 0 #1a1a1a; }
+
+  #view-mrt .task{ background: #fafafa; border-color: #1a1a1a; }
+  #view-mrt .task:hover{ background: #fff5f8; transform: translate(-2px,-2px); box-shadow: 5px 5px 0 #ec3b8a; }
+  #view-mrt .task-num{ color: #ec3b8a; font-family: 'Playfair Display', serif; font-weight: 400; font-style: italic; }
+  #view-mrt .task-body h3{ font-family: 'Playfair Display', serif; font-weight: 600; color: #1a1a1a; }
+  #view-mrt .task-body p{ color: #4a4a4a; }
+  #view-mrt .task-body a{ color: #ec3b8a; border-bottom-color: #ec3b8a; }
+  #view-mrt .task-body a:hover{ color: #1a1a1a; background: #fff5f8; border-bottom-style: solid; }
+  #view-mrt .task-section-label{ color: #ec3b8a; }
+  #view-mrt .task-section-label::before{ color: #ec3b8a; }
+  #view-mrt .task-action-btn{ background: #fff5f8; border-color: #ec3b8a; color: #1a1a1a; }
+  #view-mrt .task-action-btn:hover{ background: #ec3b8a; color: #ffffff; transform: translate(-2px,-2px); box-shadow: 3px 3px 0 #1a1a1a; }
+
+  #view-mrt .task-tag{ color: #1a1a1a; border-color: #1a1a1a; }
+  #view-mrt .task-tag.lifestyle{ background: #ec3b8a; color: #ffffff; border-color: #ec3b8a; }
+  #view-mrt .task-tag.avon{ background: #1a1a1a; color: #ffffff; border-color: #1a1a1a; }
+  #view-mrt .task-tag.community{ background: #fff5f8; }
+  #view-mrt .task-tag.blog{ background: #1a1a1a; color: #ffffff; border-color: #1a1a1a; }
+  #view-mrt .task-tag.goals{ background: #ec3b8a; color: #ffffff; border-color: #ec3b8a; }
+  #view-mrt .task-tag.trending{ background: #ffc6dd; color: #1a1a1a; border-color: #1a1a1a; }
+
+  #view-mrt .cadence.weekly{ background: #1a1a1a; color: #ffffff; }
+  #view-mrt .cadence.weekly::before{ background: #ec3b8a; }
+  #view-mrt .cadence.daily{ background: #ec3b8a; color: #ffffff; }
+  #view-mrt .cadence.daily::before{ background: #ffffff; }
+  #view-mrt .cadence.biweekly{ background: #4a4a4a; color: #ffffff; }
+  #view-mrt .cadence.biweekly::before{ background: #ec3b8a; }
+  #view-mrt .cadence.monthly{ background: #fff5f8; color: #ec3b8a; border: 1.5px solid #ec3b8a; padding: 3.5px 9px; }
+  #view-mrt .cadence.monthly::before{ background: #ec3b8a; }
+  #view-mrt .cadence.ongoing{ background: #ffffff; color: #1a1a1a; border: 1.5px solid #1a1a1a; padding: 3.5px 9px; }
+  #view-mrt .cadence.ongoing::before{ background: #1a1a1a; }
+
+  #view-mrt .idle-card{ background: linear-gradient(135deg, #fff5f8 0%, #ffe0ec 100%); color: #1a1a1a; border-color: #1a1a1a; }
+  #view-mrt .idle-card .icon{ color: #ec3b8a; }
+  #view-mrt .idle-card h4{ color: #1a1a1a; font-family: 'Playfair Display', serif; }
+  #view-mrt .idle-card p{ color: #4a4a4a; }
+  #view-mrt .idle-list li{ border-color: rgba(26,26,26,0.18); color: #4a4a4a; }
+  #view-mrt .idle-list li .marker{ color: #ec3b8a; }
+  #view-mrt .idle-card a{ color: #ec3b8a; border-bottom-color: #ec3b8a; font-weight: 600; }
+
+  #view-mrt .cadence-legend{ background: #fafafa; border-color: rgba(26,26,26,0.18); color: #4a4a4a; }
+  #view-mrt .section-label{ color: #ec3b8a; }
+
+  #view-mrt .social-card{ background: #ffffff; border-color: #1a1a1a; color: #1a1a1a; }
+  #view-mrt .social-card .logo-wrap{ background: #fff5f8; border-color: #1a1a1a; }
+  #view-mrt .social-card .platform{ font-family: 'Playfair Display', serif; color: #1a1a1a; }
+  #view-mrt .social-card .handle{ color: #4a4a4a; }
+  #view-mrt .social-card:hover{ background: #fff5f8; box-shadow: 7px 7px 0 #ec3b8a; }
+  #view-mrt .social-card .arrow-go{ color: #ec3b8a; }
+
+  #view-mrt .quote-card{ background: #fff5f8; border-color: #ec3b8a; color: #1a1a1a; font-family: 'Playfair Display', serif; }
+  #view-mrt .quote-card::before, #view-mrt .quote-card::after{ color: #ec3b8a; opacity: 0.5; }
+  #view-mrt .quote-card .attribution{ color: #ec3b8a; }
+
+  /* responsive */
+  @media (max-width: 900px){
+    .ttt-stats{ grid-template-columns: repeat(2, 1fr); }
+    .ttt-stats .stat:nth-child(2){ border-right: none; }
+    .ttt-stats .stat:nth-child(1), .ttt-stats .stat:nth-child(2){ border-bottom: 1.5px solid #2a1d28; }
+    .panel{ padding: 32px 28px; }
+    .ttt-header, .ajt-header, .mrt-header{ padding: 36px 32px; }
+  }
+  @media (max-width: 720px){
+    .container, .home-container{ padding: 24px 16px 60px; }
+    .top-nav{ padding: 12px 16px; gap: 12px; }
+    .nav-brand{ font-size: 14px; }
+    .nav-link{ padding: 7px 11px; font-size: 10px; }
+    .ttt-header, .ajt-header, .mrt-header{ padding: 28px 22px; }
+    .panel{ padding: 24px 20px; }
+    .task{ grid-template-columns: 48px 1fr; padding: 22px; gap: 18px; }
+    .task-num{ font-size: 38px; }
+    .tag-stack{ grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; margin-top: 6px; }
+    .tab{ padding: 12px 16px; font-size: 11px; }
+    .tab .tab-num{ display: none; }
+    .idle-card{ grid-template-columns: 1fr; padding: 24px; }
+    .quote-card{ font-size: 18px; padding: 28px 24px; }
+    .quote-card::before, .quote-card::after{ font-size: 50px; }
+    .home-hero{ padding: 40px 24px; }
+    .brand-card{ min-height: auto; padding: 28px 24px; }
+  }
+</style>
+</head>
+<body data-view="home">
+
+<!-- ============================================
+     SVG LOGO DEFS
+     ============================================ -->
+<svg class="svg-defs" aria-hidden="true">
+  <defs>
+    <symbol id="logo-youtube" viewBox="0 0 32 32">
+      <path fill="#FF0000" d="M31.36 8.32a4 4 0 0 0-2.82-2.83C26.04 4.8 16 4.8 16 4.8s-10.04 0-12.54.69A4 4 0 0 0 .64 8.32C0 10.84 0 16 0 16s0 5.16.64 7.68a4 4 0 0 0 2.82 2.83C5.96 27.2 16 27.2 16 27.2s10.04 0 12.54-.69a4 4 0 0 0 2.82-2.83C32 21.16 32 16 32 16s0-5.16-.64-7.68z"/>
+      <path fill="#FFFFFF" d="M12.8 20.8 21.12 16 12.8 11.2v9.6z"/>
+    </symbol>
+    <symbol id="logo-instagram" viewBox="0 0 32 32">
+      <defs>
+        <radialGradient id="ig-grad" cx="30%" cy="107%" r="150%">
+          <stop offset="0%" stop-color="#FDF497"/>
+          <stop offset="5%" stop-color="#FDF497"/>
+          <stop offset="45%" stop-color="#FD5949"/>
+          <stop offset="60%" stop-color="#D6249F"/>
+          <stop offset="90%" stop-color="#285AEB"/>
+        </radialGradient>
+      </defs>
+      <rect width="32" height="32" rx="8" fill="url(#ig-grad)"/>
+      <rect x="6" y="6" width="20" height="20" rx="5.5" fill="none" stroke="#fff" stroke-width="2"/>
+      <circle cx="16" cy="16" r="4.5" fill="none" stroke="#fff" stroke-width="2"/>
+      <circle cx="22" cy="10" r="1.4" fill="#fff"/>
+    </symbol>
+    <symbol id="logo-facebook" viewBox="0 0 32 32">
+      <path fill="#1877F2" d="M32 16C32 7.16 24.84 0 16 0S0 7.16 0 16c0 7.99 5.85 14.62 13.5 15.81V20.62H9.44V16h4.06v-3.52c0-4 2.39-6.22 6.04-6.22 1.75 0 3.58.31 3.58.31v3.94h-2.02c-1.99 0-2.6 1.23-2.6 2.5V16h4.43l-.71 4.62h-3.72v11.19C26.15 30.62 32 23.99 32 16z"/>
+      <path fill="#fff" d="M22.22 20.62 22.93 16h-4.43v-2.99c0-1.27.61-2.5 2.6-2.5h2.02V6.57s-1.83-.31-3.58-.31c-3.65 0-6.04 2.22-6.04 6.22V16H9.44v4.62h4.06v11.19a16.13 16.13 0 0 0 5 0V20.62h3.72z"/>
+    </symbol>
+    <symbol id="logo-pinterest" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="16" fill="#E60023"/>
+      <path fill="#fff" d="M16.32 6c-5.97 0-9 4.28-9 7.85 0 2.16.82 4.08 2.57 4.8.29.12.55 0 .63-.32.06-.22.2-.78.26-1.01.08-.32.05-.43-.18-.7a3.7 3.7 0 0 1-.84-2.5c0-3.22 2.41-6.1 6.27-6.1 3.42 0 5.3 2.09 5.3 4.88 0 3.67-1.62 6.77-4.04 6.77-1.33 0-2.33-1.1-2.01-2.46.39-1.62 1.13-3.36 1.13-4.53 0-1.04-.56-1.92-1.72-1.92-1.36 0-2.46 1.41-2.46 3.3 0 1.21.41 2.02.41 2.02L11 22.36c-.5 2.13-.07 4.74-.04 5 .02.16.22.2.32.08.13-.18 1.85-2.3 2.43-4.37.17-.59.95-3.7.95-3.7.47.89 1.83 1.67 3.27 1.67 4.31 0 7.23-3.93 7.23-9.18 0-3.97-3.36-7.66-8.84-7.66z"/>
+    </symbol>
+    <symbol id="logo-tiktok" viewBox="0 0 32 32">
+      <rect width="32" height="32" rx="6" fill="#000"/>
+      <path fill="#FF0050" d="M22.5 12.8a6.5 6.5 0 0 1-3.8-1.2v6.5a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .8.1v2.7a3 3 0 1 0 2.1 2.9V6.5h2.7a3.8 3.8 0 0 0 3.8 3.6v2.7z" transform="translate(2,2)"/>
+      <path fill="#00F2EA" d="M21.5 11.8a6.5 6.5 0 0 1-3.8-1.2v6.5a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .8.1v2.7a3 3 0 1 0 2.1 2.9V5.5h2.7a3.8 3.8 0 0 0 3.8 3.6v2.7z" transform="translate(1,1)"/>
+      <path fill="#fff" d="M22 12.3a6.5 6.5 0 0 1-3.8-1.2v6.5a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .8.1v2.7a3 3 0 1 0 2.1 2.9V6h2.7a3.8 3.8 0 0 0 3.8 3.6v2.7z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============================================
+     TOP NAV (always visible)
+     ============================================ -->
+<nav class="top-nav" id="topNav">
+  <a class="nav-brand" data-go="home">The Traveling Taylors · SMM</a>
+  <div class="nav-links">
+    <a class="nav-link active" data-go="home">Home</a>
+    <a class="nav-link" data-go="ttt">The Traveling Taylors</a>
+    <a class="nav-link" data-go="ajt">Ashleigh J. Taylor</a>
+    <a class="nav-link" data-go="mrt">Marva R. Taylor</a>
+  </div>
+</nav>
+
+<!-- ============================================
+     HOME VIEW
+     ============================================ -->
+<div class="view active" id="view-home">
+  <div class="home-container">
+
+    <div class="home-hero">
+      <div class="home-eyebrow">Social Media Manager · Command Center</div>
+      <h1 class="home-title">Three brands.<br>One <em>field guide</em>.</h1>
+      <p class="home-subtitle">Every recurring task, every channel, every cadence — split clean by brand. Pick a brand below.</p>
+      <div class="home-meta-row">
+        <span><span class="dot"></span>3 Brands</span>
+        <span><span class="dot"></span>23 Recurring Tasks</span>
+        <span><span class="dot"></span>13 Channels</span>
+      </div>
+    </div>
+
+    <div class="brand-grid-label">Choose a Brand</div>
+    <div class="brand-grid">
+
+      <a class="brand-card ttt" data-go="ttt">
+        <div class="brand-card-eyebrow">Travel · Lifestyle · Vlog</div>
+        <div class="brand-card-name">The Traveling Taylors</div>
+        <div class="brand-card-tagline">A mother-daughter duo, traveling the world one country at a time.</div>
+        <div class="brand-card-stats">
+          <div class="brand-card-stat"><div class="n">12</div><div class="l">Tasks</div></div>
+          <div class="brand-card-stat"><div class="n">7</div><div class="l">Channels</div></div>
+          <div class="brand-card-stat"><div class="n">45+</div><div class="l">Countries</div></div>
+        </div>
+        <div class="brand-card-desc">YouTube long-form, FB/IG reels &amp; stories, Pinterest pins, community posts. Pink &amp; yellow brand voice. Adventurous &amp; warm.</div>
+        <div class="brand-card-cta">
+          <span class="brand-card-cta-text">Open Dashboard</span>
+          <span class="brand-card-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="brand-card ajt" data-go="ajt">
+        <div class="brand-card-eyebrow">Personal Brand · Creative Entrepreneur</div>
+        <div class="brand-card-name">Ashleigh Jessica Taylor</div>
+        <div class="brand-card-tagline">Where business meets freedom, and creativity knows no borders.</div>
+        <div class="brand-card-stats">
+          <div class="brand-card-stat"><div class="n">5</div><div class="l">Tasks</div></div>
+          <div class="brand-card-stat"><div class="n">3</div><div class="l">Channels</div></div>
+          <div class="brand-card-stat"><div class="n">3</div><div class="l">Ventures</div></div>
+        </div>
+        <div class="brand-card-desc">Editorial blog, YouTube, Instagram, The Insider's Lab. Sophisticated with a bright orange accent. Business storytelling.</div>
+        <div class="brand-card-cta">
+          <span class="brand-card-cta-text">Open Dashboard</span>
+          <span class="brand-card-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="brand-card mrt" data-go="mrt">
+        <div class="brand-card-eyebrow">Retirement · Lifestyle · Wisdom</div>
+        <div class="brand-card-name">Marva Rudder Taylor</div>
+        <div class="brand-card-tagline">Life's too short for limits — exploring, thriving &amp; living fully at every age.</div>
+        <div class="brand-card-stats">
+          <div class="brand-card-stat"><div class="n">6</div><div class="l">Tasks</div></div>
+          <div class="brand-card-stat"><div class="n">3</div><div class="l">Channels</div></div>
+          <div class="brand-card-stat"><div class="n">★</div><div class="l">Live Boldly</div></div>
+        </div>
+        <div class="brand-card-desc">The Next Chapter blog, Avon community, travel content. Bright pink &amp; white aesthetic. Warm, wise &amp; radiant.</div>
+        <div class="brand-card-cta">
+          <span class="brand-card-cta-text">Open Dashboard</span>
+          <span class="brand-card-arrow">→</span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="home-quicklinks">
+      <div class="home-ql-title">Universal Quick Links</div>
+      <div class="home-ql-grid">
+        <a class="home-ql-btn" href="https://blue.cc/org/ceo-creatives/assigned" target="_blank" rel="noopener">My Assigned Tasks ↗</a>
+        <a class="home-ql-btn" href="https://business.facebook.com/" target="_blank" rel="noopener">Meta Business Suite ↗</a>
+        <a class="home-ql-btn" href="https://www.pinterest.com/" target="_blank" rel="noopener">Pinterest ↗</a>
+      </div>
+    </div>
+
+    <footer>The Traveling Taylors SMM · Field Guide · Made with ♥</footer>
+  </div>
+</div>
+
+<!-- ============================================
+     THE TRAVELING TAYLORS VIEW
+     ============================================ -->
+<div class="view" id="view-ttt">
+  <div class="container">
+
+    <div class="ttt-header">
+      <div style="position:relative; z-index:1;">
+        <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8a2a52; margin-bottom:14px; font-weight:500;">✈️ Brand Dashboard · Travel</div>
+        <h1 class="ttt-h1">The Traveling<br><em>Taylors</em></h1>
+        <p style="font-family:'Fraunces',serif; font-style:italic; font-size:18px; color:#5a4452; margin-top:18px; max-width:580px; line-height:1.5;">A mother-daughter duo. 45+ countries. 5 of 7 continents. One field guide for managing every channel, schedule, and post.</p>
+        <a href="https://thetravelingtaylors.world" target="_blank" rel="noopener" style="margin-top:18px; display:inline-flex; align-items:center; gap:10px; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#2a1d28; text-decoration:none; padding:10px 16px; background:#fff5e6; border:1.5px solid #d44d83; transition:all 0.2s ease; font-weight:600;">🌐 thetravelingtaylors.world ↗</a>
+        <div style="margin-top:24px; padding-top:20px; border-top:1px dashed rgba(42,29,40,0.18); font-family:'Fraunces',serif; font-size:14px; color:#5a4452; letter-spacing:0.04em;">
+          <strong style="color:#d44d83; font-size:16px;">T</strong>raveling. <strong style="color:#d44d83; font-size:16px;">A</strong>dventurous. <strong style="color:#d44d83; font-size:16px;">Y</strong>oung. <strong style="color:#d44d83; font-size:16px;">L</strong>uxurious. <strong style="color:#d44d83; font-size:16px;">O</strong>dyssey. <strong style="color:#d44d83; font-size:16px;">R</strong>oaming.
+        </div>
+      </div>
+    </div>
+
+    <div class="ttt-stats">
+      <div class="stat"><div class="num">12</div><div class="label">Recurring Tasks</div></div>
+      <div class="stat"><div class="num">7</div><div class="label">Channels</div></div>
+      <div class="stat"><div class="num">45+</div><div class="label">Countries</div></div>
+      <div class="stat"><div class="num">∞</div><div class="label">Adventures</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-target="ttt-tasks"><span class="tab-num">01</span>Tasks &amp; Cadence</button>
+      <button class="tab" data-target="ttt-links"><span class="tab-num">02</span>Social Links</button>
+      <button class="tab" data-target="ttt-analytics"><span class="tab-num">03</span>Analytics</button>
+    </div>
+
+    <section class="panel active" id="ttt-tasks">
+      <div class="panel-intro">
+        <div class="panel-title">The <em>monthly</em> rhythm</div>
+        <div class="panel-meta">12 Tasks</div>
+      </div>
+
+      <div class="quick-links">
+        <span class="quick-links-label">✦ Quick Access</span>
+        <a class="ql-btn" href="https://blue.cc/org/ceo-creatives/assigned" target="_blank" rel="noopener">My Assigned Tasks ↗</a>
+        <a class="ql-btn" href="https://docs.google.com/spreadsheets/d/1DWyIkxxsiNSQ_mobu5lzfFIoi6F6VpnYfzzgVwh3S8c/edit?usp=sharing" target="_blank" rel="noopener">Goals Sheet ↗</a>
+        <a class="ql-btn" href="https://www.canva.com/folder/FAHIkAMC7Tg" target="_blank" rel="noopener">Thumbnails (Canva) ↗</a>
+        <a class="ql-btn" href="https://studio.youtube.com/channel/UCvhJ-biUGc7CPF-0sFvKBJQ" target="_blank" rel="noopener">YouTube Studio ↗</a>
+        <a class="ql-btn" href="https://docs.google.com/spreadsheets/d/1tYJ8tXzCfbd1GTVygXN6pJPctfNkn5CKBVSfYdl16LU/edit?gid=0#gid=0" target="_blank" rel="noopener">YouTube Sheet ↗</a>
+        <a class="ql-btn" href="https://docs.google.com/spreadsheets/d/1Im2Ib0pmN0BNIGzUUv_KYm1Xj_Tz0wa4c7ZNdy_brlc/edit?gid=0#gid=0" target="_blank" rel="noopener">Community Posts Sheet ↗</a>
+        <a class="ql-btn" href="https://docs.google.com/spreadsheets/d/1BIBmGdoTURYJ80aMuxzTejBY54lKN_T_UkQcnfe0a20/edit?usp=drivesdk" target="_blank" rel="noopener">SFV Sheet ↗</a>
+        <a class="ql-btn" href="https://docs.google.com/spreadsheets/d/1c92gFKmOSyXKp2YKNMYEYuUJTnGvV8RCb4t2PvCPmYQ/edit?gid=0#gid=0" target="_blank" rel="noopener">Trending Videos Sheet ↗</a>
+        <a class="ql-btn" href="https://business.facebook.com/latest/home?business_id=212115851262192&amp;asset_id=106007809044448" target="_blank" rel="noopener">Meta Business Suite ↗</a>
+        <a class="ql-btn" href="https://www.sociamonials.com/accounts/social_media.php" target="_blank" rel="noopener">Sociamonials ↗</a>
+        <a class="ql-btn" href="https://www.pinterest.com/Thetravelingtaylors/" target="_blank" rel="noopener">Pinterest ↗</a>
+      </div>
+
+      <div class="task-list">
+
+        <div class="task-section-label">Start of the Month</div>
+        <article class="task">
+          <div class="task-num">01</div>
+          <div class="task-body">
+            <h3>Pull Monthly Goals from Slack</h3>
+            <p>At the <strong>start of every month</strong>, review the Slack channels you're a part of and pull the goals being shared by the team. Drop them into the goals spreadsheet so everything is documented in one place.</p>
+            <p>This is what we're working toward all month — make sure nothing slips through.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://docs.google.com/spreadsheets/d/1DWyIkxxsiNSQ_mobu5lzfFIoi6F6VpnYfzzgVwh3S8c/edit?usp=sharing" target="_blank" rel="noopener">📋 TTT Goals Sheet <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence monthly">Monthly · Start</span><span class="task-tag goals">Goals</span></div>
+        </article>
+
+        <div class="task-section-label">Weekly Rhythm</div>
+
+        <article class="task">
+          <div class="task-num">02</div>
+          <div class="task-body">
+            <h3>Finish YouTube Thumbnails</h3>
+            <p>Thumbnails are pre-built. Your job is to add images of Marva &amp; Ashleigh from the specified location, make them transparent (cut them out from the background), and place them into the thumbnail.</p>
+            <p>Use an <strong>outline effect</strong> around us where you think it's needed — usually whenever the subject blends into the background.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://www.canva.com/folder/FAHIkAMC7Tg" target="_blank" rel="noopener">🎨 TTT Thumbnails (Canva) <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag youtube">YouTube</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">03</div>
+          <div class="task-body">
+            <h3>Schedule YouTube Videos</h3>
+            <p>In <a href="https://studio.youtube.com/channel/UCvhJ-biUGc7CPF-0sFvKBJQ" target="_blank" rel="noopener">YouTube Studio</a>, attach the finished thumbnail to its corresponding video, then add the description pulled from the <a href="https://docs.google.com/spreadsheets/d/1tYJ8tXzCfbd1GTVygXN6pJPctfNkn5CKBVSfYdl16LU/edit?gid=0#gid=0" target="_blank" rel="noopener">YouTube spreadsheet</a>.</p>
+            <p>Schedule the video for the date listed in the sheet — <strong>do not upload new videos</strong>, just schedule the ones already there. Once scheduled, paste the final YouTube video link back into the spreadsheet.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://docs.google.com/spreadsheets/d/1tYJ8tXzCfbd1GTVygXN6pJPctfNkn5CKBVSfYdl16LU/edit?gid=0#gid=0" target="_blank" rel="noopener">📋 YouTube Sheet <span class="arr">↗</span></a>
+              <a class="task-action-btn" href="https://studio.youtube.com/channel/UCvhJ-biUGc7CPF-0sFvKBJQ" target="_blank" rel="noopener">▶ YouTube Studio <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag youtube">YouTube</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">04</div>
+          <div class="task-body">
+            <h3>YouTube Community Posts</h3>
+            <p>Create and post community posts on the main YouTube channel — keep them aligned with what's currently being released and the overall brand voice. Pull post copy from the community posts spreadsheet.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://docs.google.com/spreadsheets/d/1Im2Ib0pmN0BNIGzUUv_KYm1Xj_Tz0wa4c7ZNdy_brlc/edit?gid=0#gid=0" target="_blank" rel="noopener">📋 Community Posts Sheet <span class="arr">↗</span></a>
+              <a class="task-action-btn" href="https://www.youtube.com/channel/UCvhJ-biUGc7CPF-0sFvKBJQ/posts" target="_blank" rel="noopener">▶ Schedule on YouTube <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence biweekly">Bi-Weekly</span><span class="task-tag youtube">YouTube</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">05</div>
+          <div class="task-body">
+            <h3>Edit Short-Form Videos</h3>
+            <p>Edit short-form videos using the <a href="https://docs.google.com/spreadsheets/d/1BIBmGdoTURYJ80aMuxzTejBY54lKN_T_UkQcnfe0a20/edit?usp=drivesdk" target="_blank" rel="noopener">SFV Spreadsheet</a> and the instructions in the corresponding Blue task.</p>
+            <p>These finished short videos become the source content for Facebook &amp; Instagram reels, posts, and stories.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://docs.google.com/spreadsheets/d/1BIBmGdoTURYJ80aMuxzTejBY54lKN_T_UkQcnfe0a20/edit?usp=drivesdk" target="_blank" rel="noopener">📋 SFV Sheet <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag editing">Editing</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">06</div>
+          <div class="task-body">
+            <h3>Schedule Short-Form Videos</h3>
+            <p>Once short-form videos are edited, schedule them out across all relevant platforms (Facebook reels, Instagram reels, etc.). Coordinate the schedule with the rest of the content calendar so SFVs don't pile up on the same day as long-form drops.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://docs.google.com/spreadsheets/d/1BIBmGdoTURYJ80aMuxzTejBY54lKN_T_UkQcnfe0a20/edit?usp=drivesdk" target="_blank" rel="noopener">📋 SFV Sheet <span class="arr">↗</span></a>
+              <a class="task-action-btn" href="https://business.facebook.com/latest/home?business_id=212115851262192&amp;asset_id=106007809044448" target="_blank" rel="noopener">⚡ Meta Business <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag editing">SFV</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">07</div>
+          <div class="task-body">
+            <h3>Schedule Facebook &amp; Instagram Stories</h3>
+            <p>Via <strong>Meta Business Suite</strong>, schedule stories for the main Facebook page (and Instagram where applicable). Pull source content from the short-form videos edited with Maliki.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://business.facebook.com/latest/home?business_id=212115851262192&amp;asset_id=106007809044448" target="_blank" rel="noopener">⚡ Meta Business <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence daily">Daily</span><span class="task-tag meta">Meta</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">08</div>
+          <div class="task-body">
+            <h3>Schedule Facebook Posts</h3>
+            <p>Schedule feed posts on the main Facebook page through Meta Business Suite. Use the same edited short-form content as the source.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://business.facebook.com/latest/home?business_id=212115851262192&amp;asset_id=106007809044448" target="_blank" rel="noopener">⚡ Meta Business <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag meta">Meta</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">09</div>
+          <div class="task-body">
+            <h3>Schedule Facebook Reels</h3>
+            <p>Schedule reels on Facebook from the same pool of edited short-form videos. Stagger them so they don't all post on the same day as the regular feed posts.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://business.facebook.com/latest/home?business_id=212115851262192&amp;asset_id=106007809044448" target="_blank" rel="noopener">⚡ Meta Business <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag meta">Meta</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">10</div>
+          <div class="task-body">
+            <h3>Schedule Pinterest Pins</h3>
+            <p>Create and schedule pins for the <a href="https://www.pinterest.com/Thetravelingtaylors/" target="_blank" rel="noopener">TTT Pinterest account</a>. Pull imagery from recent travels and link pins back to the corresponding YouTube videos or blog posts. Use travel-search-friendly titles and descriptions (e.g., "Things to do in [City]").</p>
+            <p>Schedule the pins through <strong>Sociamonials</strong> — that's our scheduler for Pinterest.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://www.sociamonials.com/accounts/social_media.php" target="_blank" rel="noopener">⚡ Sociamonials Scheduler <span class="arr">↗</span></a>
+              <a class="task-action-btn" href="https://www.pinterest.com/Thetravelingtaylors/" target="_blank" rel="noopener">📌 TTT Pinterest <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag pinterest">Pinterest</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">11</div>
+          <div class="task-body">
+            <h3>Trending Videos — Find, Assign, Review</h3>
+            <p>Hunt for trending short-form video formats, sounds, and hooks that fit the TTT voice (mother-daughter, travel, adventurous, warm). When you find ones worth recreating, <strong>assign them to Nyla</strong> with the source link and a short note on why it fits the brand.</p>
+            <p>Once Nyla submits her version, <strong>review it and follow the workflow</strong> — feedback, revisions, approval, then queue for scheduling.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://docs.google.com/spreadsheets/d/1c92gFKmOSyXKp2YKNMYEYuUJTnGvV8RCb4t2PvCPmYQ/edit?gid=0#gid=0" target="_blank" rel="noopener">📋 Trending Videos Sheet <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag trending">Trending</span></div>
+        </article>
+
+        <div class="task-section-label">End of the Month</div>
+        <article class="task">
+          <div class="task-num">12</div>
+          <div class="task-body">
+            <h3>End-of-Month Goals Review</h3>
+            <p>At the <strong>end of every month</strong>, go back to the goals spreadsheet and review what was set at the start of the month. For each goal, mark whether or not we hit it — and note <strong>why</strong>.</p>
+            <p>This isn't just bookkeeping. The "why" is what tells us what to keep doing, what to drop, and what to push harder on next month.</p>
+            <div class="task-actions">
+              <a class="task-action-btn" href="https://docs.google.com/spreadsheets/d/1DWyIkxxsiNSQ_mobu5lzfFIoi6F6VpnYfzzgVwh3S8c/edit?usp=sharing" target="_blank" rel="noopener">📋 TTT Goals Sheet <span class="arr">↗</span></a>
+            </div>
+          </div>
+          <div class="tag-stack"><span class="cadence monthly">Monthly · End</span><span class="task-tag goals">Goals</span></div>
+        </article>
+
+      </div>
+
+      <div class="cadence-legend">
+        <span class="legend-label">Cadence Key</span>
+        <div class="item"><span class="cadence daily">Daily</span> Every day</div>
+        <div class="item"><span class="cadence weekly">Weekly</span> Most weeks</div>
+        <div class="item"><span class="cadence biweekly">Bi-Weekly</span> Every other week</div>
+        <div class="item"><span class="cadence monthly">Monthly</span> Start &amp; end of month</div>
+        <div class="item"><span class="cadence ongoing">Ongoing</span> As needed / fill time</div>
+      </div>
+
+      <div class="idle-card">
+        <div class="icon">✦</div>
+        <div>
+          <h4>When tasks are done — fill the hours ✈️</h4>
+          <p>If everything assigned is complete and there's still time left in the week, do one of the following. The goal is to use up all your hours productively, and always check <a href="https://blue.cc/org/ceo-creatives/assigned" target="_blank" rel="noopener">your assigned tasks in Blue</a> first to make sure nothing's been missed.</p>
+          <ul class="idle-list">
+            <li><span class="marker">i.</span><div><strong>Watch The Traveling Taylors YouTube videos.</strong> Stay immersed in the brand, the voice, and the content — it'll make every other task sharper.</div></li>
+            <li><span class="marker">ii.</span><div><strong>Research platforms.</strong> Look into how other travel creators are growing on YouTube, IG, Pinterest, TikTok. What hooks are landing? What formats are trending? Take notes.</div></li>
+            <li><span class="marker">iii.</span><div><strong>Come up with new strategies to test.</strong> Pitch new content formats, posting schedules, hashtag groups, hook templates, or platform features we haven't tried yet. Drop ideas in Blue or Slack so we can run experiments next month.</div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="ttt-links">
+      <div class="panel-intro">
+        <div class="panel-title">All the <em>destinations</em></div>
+        <div class="panel-meta">7 Channels</div>
+      </div>
+
+      <div class="social-section">
+        <div class="section-label">🌎 Main Channels — The Traveling Taylors</div>
+        <div class="social-grid">
+          <a class="social-card youtube" href="https://www.youtube.com/@thetravelingtaylors" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-youtube"/></svg></div>
+            <div class="platform">YouTube</div>
+            <div class="handle">@thetravelingtaylors</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card instagram" href="https://www.instagram.com/thetravelingtaylors.world/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-instagram"/></svg></div>
+            <div class="platform">Instagram</div>
+            <div class="handle">@thetravelingtaylors.world</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card facebook" href="https://www.facebook.com/thetravelingtaylors.world" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-facebook"/></svg></div>
+            <div class="platform">Facebook</div>
+            <div class="handle">/thetravelingtaylors.world</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card pinterest" href="https://www.pinterest.com/Thetravelingtaylors/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-pinterest"/></svg></div>
+            <div class="platform">Pinterest</div>
+            <div class="handle">/Thetravelingtaylors</div>
+            <div class="arrow-go">→</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="social-section">
+        <div class="section-label">👩🏽 👧🏾 Individual Pages</div>
+        <div class="social-grid">
+          <a class="social-card individual" href="https://www.instagram.com/ashleighjessicataylor/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-instagram"/></svg></div>
+            <div class="platform">Ashleigh · IG</div>
+            <div class="handle">@ashleighjessicataylor</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card individual" href="https://www.instagram.com/marvaruddertaylor/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-instagram"/></svg></div>
+            <div class="platform">Marva · IG</div>
+            <div class="handle">@marvaruddertaylor</div>
+            <div class="arrow-go">→</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="quote-card">
+        Life is too short to not do what you want, so it's time to travel the world!
+        <span class="attribution">— The Traveling Taylors</span>
+      </div>
+    </section>
+
+    <section class="panel" id="ttt-analytics">
+      <div class="panel-intro">
+        <div class="panel-title">The <em>numbers</em></div>
+        <div class="panel-meta">Live Dashboard</div>
+      </div>
+
+      <div class="analytics-meta">
+        <span class="live-dot">Live · Looker Studio</span>
+        <a href="https://datastudio.google.com/embed/reporting/d2945065-7e21-43f6-95a6-fbdf2b0df8a8/page/cP3wF" target="_blank" rel="noopener" style="text-decoration:none; color:inherit; border-bottom:1.5px dotted currentColor; font-weight:500;">Open full report ↗</a>
+      </div>
+
+      <div class="analytics-wrap">
+        <iframe
+          src="https://datastudio.google.com/embed/reporting/d2945065-7e21-43f6-95a6-fbdf2b0df8a8/page/cP3wF"
+          frameborder="0"
+          allowfullscreen
+          sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+          loading="lazy"
+          title="The Traveling Taylors Analytics">
+        </iframe>
+      </div>
+    </section>
+
+    <footer>The Traveling Taylors · Field Guide · ♥</footer>
+  </div>
+</div>
+
+<!-- ============================================
+     ASHLEIGH JESSICA TAYLOR VIEW
+     ============================================ -->
+<div class="view" id="view-ajt">
+  <div class="container">
+
+    <div class="ajt-header">
+      <div class="ajt-header-eyebrow">Personal Brand · Creative Entrepreneur</div>
+      <h1 class="ajt-h1">Ashleigh Jessica<br><em>Taylor</em></h1>
+      <p class="ajt-subtitle">Where business meets freedom, and creativity knows no borders.</p>
+      <a href="https://ashleighjessicataylor.com" target="_blank" rel="noopener" class="ajt-website">🌐 ashleighjessicataylor.com ↗</a>
+      <div class="ajt-divider"></div>
+      <div class="ajt-tagline"><span>Brand Builder</span> · <span>Entrepreneur</span> · <span>Global Explorer</span></div>
+    </div>
+
+    <div class="ajt-ventures">
+      <div class="v">
+        <div class="v-num">VENTURE 01</div>
+        <div class="v-name">CEO Creatives</div>
+        <div class="v-desc">Business &amp; creative center — turning passions into profit.</div>
+      </div>
+      <div class="v">
+        <div class="v-num">VENTURE 02</div>
+        <div class="v-name">The Traveling Taylors</div>
+        <div class="v-desc">Mother-daughter duo vlogging the world, one country at a time.</div>
+      </div>
+      <div class="v">
+        <div class="v-num">VENTURE 03</div>
+        <div class="v-name">The Insider's Lab</div>
+        <div class="v-desc">Behind-the-scenes documentation of new ideas, projects &amp; experiments.</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-target="ajt-tasks"><span class="tab-num">01</span>Tasks &amp; Cadence</button>
+      <button class="tab" data-target="ajt-links"><span class="tab-num">02</span>Social Links</button>
+    </div>
+
+    <section class="panel active" id="ajt-tasks">
+      <div class="panel-intro">
+        <div class="panel-title">The <em>editorial</em> rhythm</div>
+        <div class="panel-meta">5 Tasks</div>
+      </div>
+
+      <div class="quick-links">
+        <span class="quick-links-label">— Quick Access —</span>
+        <a class="ql-btn" href="https://blue.cc/org/ceo-creatives/assigned" target="_blank" rel="noopener">My Assigned Tasks ↗</a>
+        <a class="ql-btn" href="https://www.youtube.com/@AshleighJessicaTaylor" target="_blank" rel="noopener">YouTube Channel ↗</a>
+        <a class="ql-btn" href="https://ashleighjessicataylor.com" target="_blank" rel="noopener">Website ↗</a>
+        <a class="ql-btn" href="https://business.facebook.com/" target="_blank" rel="noopener">Meta Business Suite ↗</a>
+      </div>
+
+      <div class="task-list">
+
+        <div class="task-section-label">Start of the Month</div>
+        <article class="task">
+          <div class="task-num">01</div>
+          <div class="task-body">
+            <h3>Pull Monthly Goals from Slack</h3>
+            <p>At the <strong>start of every month</strong>, review the Slack channels for Ashleigh's brand goals. Drop them into the AJT goals spreadsheet — content pillars, audience milestones, post counts, anything Ashleigh has flagged.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence monthly">Monthly · Start</span><span class="task-tag goals">Goals</span></div>
+        </article>
+
+        <div class="task-section-label">Weekly Rhythm</div>
+
+        <article class="task">
+          <div class="task-num">02</div>
+          <div class="task-body">
+            <h3>Edit &amp; Schedule Short-Form Videos</h3>
+            <p>Edit short-form clips from Ashleigh's long-form content (podcast snippets, business advice quick-takes, behind-the-scenes from <em>The Insider's Lab</em>). Schedule across IG Reels and Facebook from a single content pool.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag community">SFV</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">03</div>
+          <div class="task-body">
+            <h3>Instagram Stories</h3>
+            <p>Schedule Instagram stories — quote cards from recent blog posts, behind-the-scenes from current ventures (CEO Creatives, Insider's Lab), polls/questions for community engagement. Keep the visual language clean and on-brand.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence daily">Daily</span><span class="task-tag community">Stories</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">04</div>
+          <div class="task-body">
+            <h3>Trending Videos — Find, Assign, Review</h3>
+            <p>Hunt for trending short-form video formats, sounds, and hooks that fit Ashleigh's voice (creative entrepreneur, business storytelling). When you find ones worth recreating, <strong>assign them to Nyla</strong> with the source link and a short note on why it fits.</p>
+            <p>Once Nyla submits her version, <strong>review it and follow the workflow</strong> — feedback, revisions, approval, then queue for scheduling.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag trending">Trending</span></div>
+        </article>
+
+        <div class="task-section-label">End of the Month</div>
+        <article class="task">
+          <div class="task-num">05</div>
+          <div class="task-body">
+            <h3>End-of-Month Goals Review</h3>
+            <p>Review the AJT goals from the start of the month. Mark each as hit / missed and note <strong>why</strong>. What worked for the personal brand this month? What didn't? Bring observations to next month's planning.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence monthly">Monthly · End</span><span class="task-tag goals">Goals</span></div>
+        </article>
+
+      </div>
+
+      <div class="cadence-legend">
+        <span class="legend-label">Cadence Key</span>
+        <div class="item"><span class="cadence daily">Daily</span> Every day</div>
+        <div class="item"><span class="cadence weekly">Weekly</span> Most weeks</div>
+        <div class="item"><span class="cadence biweekly">Bi-Weekly</span> Every other week</div>
+        <div class="item"><span class="cadence monthly">Monthly</span> Start &amp; end of month</div>
+        <div class="item"><span class="cadence ongoing">Ongoing</span> As needed / fill time</div>
+      </div>
+
+      <div class="idle-card">
+        <div class="icon">✦</div>
+        <div>
+          <h4>When tasks are done — fill the hours</h4>
+          <p>If everything assigned is complete and there's still time, do one of the following. Always check <a href="https://blue.cc/org/ceo-creatives/assigned" target="_blank" rel="noopener">your assigned tasks in Blue</a> first.</p>
+          <ul class="idle-list">
+            <li><span class="marker">i.</span><div><strong>Watch Ashleigh's YouTube videos.</strong> Get fluent in her voice, her perspective, and the way she talks about business and creativity.</div></li>
+            <li><span class="marker">ii.</span><div><strong>Read Note-To-Self blog posts.</strong> Internalize the editorial tone — sharp, honest, no fluff. This shapes every caption and post you write for her.</div></li>
+            <li><span class="marker">iii.</span><div><strong>Research platforms &amp; competitors.</strong> Study how other creative-entrepreneur creators (especially in business storytelling) are growing on IG, YouTube, Substack, LinkedIn. Note hooks, formats, posting cadence.</div></li>
+            <li><span class="marker">iv.</span><div><strong>Pitch new strategies to test.</strong> LinkedIn? Substack? A YouTube short series? Drop ideas in Blue or Slack for next month's experiments.</div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="ajt-links">
+      <div class="panel-intro">
+        <div class="panel-title">The <em>presence</em></div>
+        <div class="panel-meta">3 Channels</div>
+      </div>
+
+      <div class="social-section">
+        <div class="section-label">— Channels —</div>
+        <div class="social-grid">
+          <a class="social-card" href="https://www.instagram.com/ashleighjessicataylor/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-instagram"/></svg></div>
+            <div class="platform">Instagram</div>
+            <div class="handle">@ashleighjessicataylor</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card" href="https://www.youtube.com/@AshleighJessicaTaylor" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-youtube"/></svg></div>
+            <div class="platform">YouTube</div>
+            <div class="handle">@AshleighJessicaTaylor</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card" href="https://www.facebook.com/ashleighjessicataylor/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-facebook"/></svg></div>
+            <div class="platform">Facebook</div>
+            <div class="handle">/ashleighjessicataylor</div>
+            <div class="arrow-go">→</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="quote-card">
+        I've never been one to follow a traditional path. Instead, I've built a life around creativity, business, and exploration — on my own terms.
+        <span class="attribution">— Ashleigh Jessica Taylor</span>
+      </div>
+    </section>
+
+    <footer>Ashleigh Jessica Taylor · Field Guide</footer>
+  </div>
+</div>
+
+<!-- ============================================
+     MARVA RUDDER TAYLOR VIEW
+     ============================================ -->
+<div class="view" id="view-mrt">
+  <div class="container">
+
+    <div class="mrt-header">
+      <div class="mrt-header-eyebrow">✦ Personal Brand · Lifestyle &amp; Retirement</div>
+      <h1 class="mrt-h1">Marva Rudder<br><em>Taylor</em></h1>
+      <p class="mrt-subtitle">Life's too short for limits — exploring, thriving &amp; living fully at every age.</p>
+      <a href="https://marvaruddertaylor.com" target="_blank" rel="noopener" class="mrt-website">🌐 marvaruddertaylor.com ↗</a>
+      <div class="mrt-ornament">
+        <span class="line"></span>
+        <span class="star">✦</span>
+        <span class="text">Adventure · Growth · Joy</span>
+        <span class="star">✦</span>
+        <span class="line"></span>
+      </div>
+    </div>
+
+    <div class="mrt-pillars">
+      <div class="p"><div class="num">6</div><div class="label">Tasks</div></div>
+      <div class="p"><div class="num">3</div><div class="label">Channels</div></div>
+      <div class="p"><div class="num">★</div><div class="label">Live Boldly</div></div>
+      <div class="p"><div class="num">∞</div><div class="label">Chapters Ahead</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-target="mrt-tasks"><span class="tab-num">01</span>Tasks &amp; Cadence</button>
+      <button class="tab" data-target="mrt-links"><span class="tab-num">02</span>Social Links</button>
+    </div>
+
+    <section class="panel active" id="mrt-tasks">
+      <div class="panel-intro">
+        <div class="panel-title">The <em>radiant</em> rhythm</div>
+        <div class="panel-meta">6 Tasks</div>
+      </div>
+
+      <div class="quick-links">
+        <span class="quick-links-label">✦ Quick Access</span>
+        <a class="ql-btn" href="https://blue.cc/org/ceo-creatives/assigned" target="_blank" rel="noopener">My Assigned Tasks ↗</a>
+        <a class="ql-btn" href="https://marvaruddertaylor.com" target="_blank" rel="noopener">Website ↗</a>
+        <a class="ql-btn" href="https://marvaruddertaylor.com/the-golden-years-society/" target="_blank" rel="noopener">Golden Years Society ↗</a>
+        <a class="ql-btn" href="https://business.facebook.com/" target="_blank" rel="noopener">Meta Business Suite ↗</a>
+      </div>
+
+      <div class="task-list">
+
+        <div class="task-section-label">Start of the Month</div>
+        <article class="task">
+          <div class="task-num">01</div>
+          <div class="task-body">
+            <h3>Pull Monthly Goals from Slack</h3>
+            <p>At the <strong>start of every month</strong>, review Slack for Marva's brand goals — content focus areas (retirement, travel, Avon, Golden Years Society, lifestyle), audience targets, post counts. Drop them into the MRT goals spreadsheet.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence monthly">Monthly · Start</span><span class="task-tag goals">Goals</span></div>
+        </article>
+
+        <div class="task-section-label">Weekly Rhythm</div>
+
+        <article class="task">
+          <div class="task-num">02</div>
+          <div class="task-body">
+            <h3>Promote Blog on Instagram &amp; Facebook</h3>
+            <p>When a blog post goes live on <a href="https://marvaruddertaylor.com" target="_blank" rel="noopener">marvaruddertaylor.com</a>, create and schedule an Instagram &amp; Facebook post that promotes it. Use a clean, pink-accented visual style. Add a Pinterest pin too if it fits the topic — retirement and lifestyle content does well there.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag community">Social</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">03</div>
+          <div class="task-body">
+            <h3>Edit &amp; Schedule Short-Form Videos</h3>
+            <p>Edit short clips from Marva's travels, day-in-the-life retirement content, and Golden Essentials product features. Schedule them across Instagram Reels and Facebook. Keep the pace warm and unhurried — that's the brand voice.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag community">SFV</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">04</div>
+          <div class="task-body">
+            <h3>Instagram &amp; Facebook Stories</h3>
+            <p>Schedule daily stories — quote cards from blog posts, travel snippets, Avon product highlights, Golden Years Society teases. Use the pink/cream/black palette consistently.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence daily">Daily</span><span class="task-tag community">Stories</span></div>
+        </article>
+
+        <article class="task">
+          <div class="task-num">05</div>
+          <div class="task-body">
+            <h3>Trending Videos — Find, Assign, Review</h3>
+            <p>Hunt for trending short-form video formats, sounds, and hooks that fit Marva's voice (warm, wise, retirement-lifestyle). When you find ones worth recreating, <strong>assign them to Nyla</strong> with the source link and a short note on why it fits.</p>
+            <p>Once Nyla submits her version, <strong>review it and follow the workflow</strong> — feedback, revisions, approval, then queue for scheduling.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence weekly">Weekly</span><span class="task-tag trending">Trending</span></div>
+        </article>
+
+        <div class="task-section-label">End of the Month</div>
+        <article class="task">
+          <div class="task-num">06</div>
+          <div class="task-body">
+            <h3>End-of-Month Goals Review</h3>
+            <p>Review the MRT goals set at the start of the month. For each, mark hit / missed and note <strong>why</strong>. Pay attention to which content categories (retirement, travel, Avon) drove the most engagement — that informs next month's content focus.</p>
+          </div>
+          <div class="tag-stack"><span class="cadence monthly">Monthly · End</span><span class="task-tag goals">Goals</span></div>
+        </article>
+
+      </div>
+
+      <div class="cadence-legend">
+        <span class="legend-label">Cadence Key</span>
+        <div class="item"><span class="cadence daily">Daily</span> Every day</div>
+        <div class="item"><span class="cadence weekly">Weekly</span> Most weeks</div>
+        <div class="item"><span class="cadence biweekly">Bi-Weekly</span> Every other week</div>
+        <div class="item"><span class="cadence monthly">Monthly</span> Start &amp; end of month</div>
+        <div class="item"><span class="cadence ongoing">Ongoing</span> As needed / fill time</div>
+      </div>
+
+      <div class="idle-card">
+        <div class="icon">✦</div>
+        <div>
+          <h4>When tasks are done — fill the hours</h4>
+          <p>If everything assigned is complete and there's still time in the week, do one of the following. The goal is productive use of every hour. Always check <a href="https://blue.cc/org/ceo-creatives/assigned" target="_blank" rel="noopener">your assigned tasks in Blue</a> first.</p>
+          <ul class="idle-list">
+            <li><span class="marker">i.</span><div><strong>Read The Next Chapter blog.</strong> Get fluent in Marva's voice — warm, wise, unhurried. This shapes every caption you write.</div></li>
+            <li><span class="marker">ii.</span><div><strong>Research platforms &amp; the retirement-lifestyle space.</strong> Pinterest and Facebook skew older — what's working for similar creators? Note formats, hooks, and posting times.</div></li>
+            <li><span class="marker">iii.</span><div><strong>Pitch new strategies to test.</strong> Could a YouTube channel work for Marva? Should we lean harder into Pinterest? Is there a podcast play? Drop ideas in Blue or Slack for next month.</div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="mrt-links">
+      <div class="panel-intro">
+        <div class="panel-title">The <em>presence</em></div>
+        <div class="panel-meta">3 Channels</div>
+      </div>
+
+      <div class="social-section">
+        <div class="section-label">✦ Channels ✦</div>
+        <div class="social-grid">
+          <a class="social-card" href="https://www.instagram.com/marvaruddertaylor/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-instagram"/></svg></div>
+            <div class="platform">Instagram</div>
+            <div class="handle">@marvaruddertaylor</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card" href="https://www.facebook.com/" target="_blank" rel="noopener">
+            <div class="logo-wrap"><svg><use href="#logo-facebook"/></svg></div>
+            <div class="platform">Facebook</div>
+            <div class="handle">Marva Rudder Taylor</div>
+            <div class="arrow-go">→</div>
+          </a>
+          <a class="social-card" href="https://marvaruddertaylor.com" target="_blank" rel="noopener">
+            <div class="logo-wrap" style="font-family:'Playfair Display',serif; font-style:italic; font-weight:600; color:#ec3b8a; font-size:22px;">M</div>
+            <div class="platform">The Blog</div>
+            <div class="handle">marvaruddertaylor.com</div>
+            <div class="arrow-go">→</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="quote-card">
+        Retirement isn't the end of the story — it's where the real adventure begins.
+        <span class="attribution">— Marva Rudder Taylor</span>
+      </div>
+    </section>
+
+    <footer>Marva Rudder Taylor · Field Guide</footer>
+  </div>
+</div>
+
+<script>
+  // View routing
+  const views = ['home', 'ttt', 'ajt', 'mrt'];
+  const navLinks = document.querySelectorAll('.nav-link, [data-go]');
+  const topNav = document.getElementById('topNav');
+
+  function goTo(view){
+    if(!views.includes(view)) view = 'home';
+    document.body.dataset.view = view;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(n => {
+      n.classList.toggle('active', n.dataset.go === view);
+    });
+    // nav theme
+    topNav.classList.remove('warm', 'editorial', 'rose');
+    if(view === 'ttt') topNav.classList.add('warm');
+    if(view === 'ajt') topNav.classList.add('editorial');
+    if(view === 'mrt') topNav.classList.add('rose');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      goTo(link.dataset.go);
+    });
+  });
+
+  // Tab switching within each brand view
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.target;
+      const parentView = tab.closest('.view');
+      parentView.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      parentView.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(target).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
